@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project2 - Quiz</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="user-input">
+        <label for="username">Enter your name:</label>
+        <input type="text" id="username">
+        <button id="start-quiz">Start Quiz</button>
+    </div>
+
+    <div id="quiz" class="hidden">
+        <h2><span id="question"></span></h2>
+        <div id="answers"></div>
+        <p id="timer"></p>
+        <button id="submit" class="hidden">Submit Answer</button>
+    </div>
+
+    <div id="results" class="hidden">
+        <h2>Results</h2>
+        <p id="score"></p>
+        <p id="feedback"></p>
+        <button id="try-again">Try Again</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
