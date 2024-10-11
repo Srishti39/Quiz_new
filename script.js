@@ -11,7 +11,6 @@ const startQuizBtn = document.getElementById("start-quiz");
 const questionEl = document.getElementById("question");
 const answersEl = document.getElementById("answers");
 const timerEl = document.getElementById("timer");
-const submitBtn = document.getElementById("submit");
 const scoreEl = document.getElementById("score");
 const feedbackEl = document.getElementById("feedback");
 const tryAgainBtn = document.getElementById("try-again");
@@ -44,8 +43,22 @@ const questions = [
     }
 ];
 
+// Start quiz when "Start Quiz" button is clicked
 startQuizBtn.addEventListener("click", () => {
     username = document.getElementById("username").value;
+
+    /* Original Code:
+    if (username) {
+        userInput.classList.add("hidden");
+        quiz.classList.remove("hidden");
+        displayQuestion();
+        startTimer();
+    } else {
+        alert("Please enter your name");
+    }
+    */
+
+    // New Code: Modified to handle skipping the start screen if localStorage has data
     if (username) {
         userInput.classList.add("hidden");
         quiz.classList.remove("hidden");
@@ -56,6 +69,7 @@ startQuizBtn.addEventListener("click", () => {
     }
 });
 
+// Display the current question and its answers
 const displayQuestion = () => {
     const question = questions[currentQuestion];
     questionEl.textContent = question.q;
@@ -69,20 +83,22 @@ const displayQuestion = () => {
     });
 };
 
+// Start the countdown timer for each question
 const startTimer = () => {
     intervalId = setInterval(() => {
         timerEl.textContent = `Time Remaining: ${timeLeft} seconds`;
         timeLeft--;
         if (timeLeft < 0) {
             clearInterval(intervalId);
-            checkAnswer(-1); // Simulate timeout
+            checkAnswer(-1); // Timeout situation
         }
     }, 1000);
 };
 
+// Check if the selected answer is correct
 const checkAnswer = (selectedAnswer) => {
     const question = questions[currentQuestion];
-    clearInterval(intervalId); // Stop timer on submit
+    clearInterval(intervalId); // Stop timer on answer
 
     if (selectedAnswer === question.correctAnswer) {
         score++;
@@ -102,6 +118,7 @@ const checkAnswer = (selectedAnswer) => {
     }
 };
 
+// Show the final results and store them in localStorage
 const showResults = () => {
     quiz.classList.add("hidden");
     results.classList.remove("hidden");
@@ -111,35 +128,60 @@ const showResults = () => {
 
     feedbackEl.textContent = `${message}${username}!`;
 
+    /* Original Code:
     // Persist score and state on refresh using local storage
     localStorage.setItem("quizScore", score);
     localStorage.setItem("quizState", "completed");
+    */
+
+    // New Code: Storing score and username to localStorage
+    localStorage.setItem("quizScore", score);
+    localStorage.setItem("quizUsername", username);
 };
 
+// Handle the "Try Again" functionality
 tryAgainBtn.addEventListener("click", () => {
-    username = document.getElementById("username").value;
-    results.visibility="hidden";
-    results.display="none";
-    if (username) {
-        userInput.classList.add("hidden");
-        quiz.classList.remove("hidden");
-        displayQuestion();
-        startTimer();
-        checkAnswer();
-    } else {
-        alert("Please enter your name");
-    };
+    currentQuestion = 0;
+    score = 0;
+    timeLeft = 10;
+
+    results.classList.add("hidden");
+    quiz.classList.remove("hidden");
+    displayQuestion();
+    startTimer();
+
+    feedbackEl.textContent = "";
+    
+    /* Original Code:
+    localStorage.removeItem("quizScore");
+    localStorage.removeItem("quizState");
+    */
+
+    // New Code: Clear both score and username from localStorage
+    localStorage.removeItem("quizScore");
+    localStorage.removeItem("quizUsername");
 });
 
-// Check for stored score and state on page load
+// Automatically check for saved quiz data on page load
 window.onload = () => {
     const storedScore = localStorage.getItem("quizScore");
-    const quizState = localStorage.getItem("quizState");
+    const storedUsername = localStorage.getItem("quizUsername");
 
+    /* Original Code:
     if (quizState === "completed" && storedScore) {
         results.classList.remove("hidden");
         scoreEl.textContent = `Your last score was ${storedScore} out of ${questions.length}`;
         feedbackEl.textContent = "Let's try again, shall we?";
         localStorage.removeItem("quizState"); // Clear state after displaying
+    }
+    */
+
+    // New Code: Check for score and username to skip "name + start" screen
+    if (storedScore && storedUsername) {
+        username = storedUsername;
+        results.classList.remove("hidden");
+        scoreEl.textContent = `Your last score was ${storedScore} out of ${questions.length}`;
+        feedbackEl.textContent = `${storedUsername}, let's try again!`;
+        userInput.classList.add("hidden"); // Hide the name input form
     }
 };
